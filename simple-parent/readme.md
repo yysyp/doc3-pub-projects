@@ -23,7 +23,6 @@ public UserDto updateProfile(UserDto userDto) {
 }`
 
 **Http Status**
-<https://datatracker.ietf.org/doc/html/rfc7231>
 Client Error 4xx (Consumer can fix it)
 <pre>
 400 Bad Request
