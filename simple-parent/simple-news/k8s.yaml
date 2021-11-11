@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-news-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: simple-news-web
+  template:
+    metadata:
+      labels:
+        app: simple-news-web
+    spec:
+      containers:
+        - name: simple-news-web
+          image: simple-news:v1
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: APPID
+              valueFrom:
+                secretKeyRef:
+                  name: simple-news-key
+                  key: appid
+            - name: APPSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: simple-news-key
+                  key: appsecret
+          volumeMounts:
+            - name: myvolume
+              mountPath: /app/volume
+              readOnly: true
+      volumes:
+        - name: myvolume
+          secret:
+            secretName: simple-news-key
+#            items:
+#              - key: key.pem
+#                path: key.pem
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-news-service
+  labels:
+    app: simple-news-web
+spec:
+  ports:
+    - port: 8080 # between containers for service call for K8s
+      targetPort: 8080 # container port
+      nodePort: 30080 # by default >30000 for external call
+  type: NodePort
+  selector:
+    app: simple-news-web
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: simple-news-key
+type: Opaque
+data:
+  appid: QVBQMTIzNA==
+  appsecret: UGFzc3dkXzEyMzQ1Ng==
+  key.pem: VGhpcyBpcyB0aGUgZGF0YSBmcm9tIGtleS5wZW0gZmlsZSBmcm9tIHNlY3JldApnb29kIGx1Y2t+Cl9fa3ViZXJuZXRzIHNlY3JldHM=
+
