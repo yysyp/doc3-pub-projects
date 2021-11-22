@@ -32,6 +32,8 @@
     </dependencies>
 
     <dependencyManagement>
+        <!-- Dependencies put here will declare the versions for the child
+         pom to refer to-->
         <dependencies>
             <dependency>
                 <groupId>org.springdoc</groupId>

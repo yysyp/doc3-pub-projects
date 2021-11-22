@@ -42,6 +42,33 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>7.0.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
+        <!-- Mocked memory mongodb-->
+        <dependency>
+            <groupId>de.bwaldvogel</groupId>
+            <artifactId>mongo-java-server-memory-backend</artifactId>
+            <version>1.38.0</version>
+        </dependency>
+
+        <!-- Mocked h2 backed mongodb-->
+<!--        <dependency>-->
+<!--            <groupId>de.bwaldvogel</groupId>-->
+<!--            <artifactId>mongo-java-server-h2-backend</artifactId>-->
+<!--            <version>1.38.0</version>-->
+<!--        </dependency>-->
+
+
+
     </dependencies>
 
 </project>
