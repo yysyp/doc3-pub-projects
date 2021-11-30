@@ -2,8 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: simple-news-web
+  namespace: app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: simple-news-web
@@ -51,6 +52,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: simple-news-service
+  namespace: app
   labels:
     app: simple-news-web
 spec:
@@ -72,4 +74,3 @@ data:
   appid: QVBQMTIzNA==
   appsecret: UGFzc3dkXzEyMzQ1Ng==
   key.pem: VGhpcyBpcyB0aGUgZGF0YSBmcm9tIGtleS5wZW0gZmlsZSBmcm9tIHNlY3JldApnb29kIGx1Y2t+Cl9fa3ViZXJuZXRzIHNlY3JldHM=
-
