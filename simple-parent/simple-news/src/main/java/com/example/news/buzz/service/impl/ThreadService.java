@@ -6,12 +6,14 @@ import com.example.news.buzz.model.NewsThread;
 import com.example.news.exception.CodeEnum;
 import com.example.news.exception.ServerApiException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -19,7 +21,10 @@ import java.util.UUID;
 public class ThreadService {
 
     @Autowired
-    ThreadDao threadDao;
+    private ThreadDao threadDao;
+
+    @Autowired
+    private RetryService retryService;
 
     //@Transactional
     /* Mongodb multi-document transaction requires replica-set and version 4.0+ */
@@ -29,6 +34,7 @@ public class ThreadService {
 
         String uniqueId = null;
         NewsThread savedNewsThread = null;
+        //Retry solution 1, retry by yourself
         int retryCountDown = 5;
         while(retryCountDown-- > 0) {
             try {
@@ -52,6 +58,10 @@ public class ThreadService {
     }
 
     public NewsThreadDto findNewsThreadById(Integer id) {
+        //Test Retry, retry solution 2, springboot annotation
+        BigDecimal bigDecimal = retryService.divide(new BigDecimal(""+RandomUtils.nextInt()),
+                new BigDecimal(""+RandomUtils.nextInt()));
+        log.info("SNS random divide result is {}", bigDecimal);
         NewsThread newsThread = threadDao.findNewsThreadById(id);
         NewsThreadDto newsThreadDto = new NewsThreadDto();
         BeanUtils.copyProperties(newsThread, newsThreadDto);

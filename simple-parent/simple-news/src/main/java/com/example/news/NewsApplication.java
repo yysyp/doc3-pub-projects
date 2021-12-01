@@ -4,12 +4,20 @@ import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 import de.bwaldvogel.mongo.backend.memory.MemoryDatabase;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PreDestroy;
 
+
+@EnableScheduling
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30M")
 @Slf4j
+@EnableRetry
 @SpringBootApplication
 public class NewsApplication {
 

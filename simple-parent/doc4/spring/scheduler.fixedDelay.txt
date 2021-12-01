@@ -1,0 +1,21 @@
+@Scheduled(fixedDelay = 2000)
+public void scheduleTaskWithFixedDelay() throws InterruptedException {
+    logger.info("Fixed Delay Task: Start Time - {}", formatter.format(LocalDateTime.now()));
+
+    // add some virtual processing time
+    TimeUnit.SECONDS.sleep(3);
+
+    logger.info("Fixed Delay Task: End Time - {}", formatter.format(LocalDateTime.now()));
+}
+
+The task is scheduled to execute every 2 seconds and prints the start and finish times of the execution. Since we have added 3 seconds of virtual processing time, it will take at least 3 seconds to complete. There will be a delay of 5 seconds between successive invocations:
+Fixed Delay Task: Start Time - 14:02:28
+Fixed Delay Task: End Time - 14:02:31
+Fixed Delay Task: Start Time - 14:02:33
+Fixed Delay Task: End Time - 14:02:36
+Fixed Delay Task: Start Time - 14:02:38
+Fixed Delay Task: End Time - 14:02:41
+Fixed Delay Task: Start Time - 14:02:43
+Fixed Delay Task: End Time - 14:02:46
+
+This option is best suited when the previous execution of the task must be completed before executing it again. The fixedDelay property makes sure that is always a delay of n milliseconds between consecutive invocations of a task. For dependent tasks, it is pretty helpful.

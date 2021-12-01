@@ -1,0 +1,25 @@
+SchedulingConfigurer 动态修改定时规则，网上有两种方法，都有缺点。
+
+1. 一种如下：
+
+https://blog.csdn.net/xht555/article/details/53121962
+
+此方法，是在触发运行的时候，刷新定时规则，这种方法的缺点是，刷新规则的时间必须是在某次触发运行的时候。
+使用Spring的任务调度给我们的开发带来了极大的便利，不过当我们的任务调度配置完成后，很难再对其进行更改，
+除非停止服务器，修改配置，然后再重启，显然这样是不利于线上操作的，为了实现动态的任务调度修改，我在网上
+也查阅了一些资料，大部分都是基于quartz实现的，使用Spring内置的任务调度则少之又少，而且效果不理想，
+需要在下次任务执行后，新的配置才能生效，做不到立即生效。
+
+
+2. 另一种是
+
+https://blog.csdn.net/jianggujin/article/details/77937316
+
+此方法基于 SchedulingConfigurer 的源码，捕获 ScheduledTaskRegistrar 类的实例，通过该类中的 TaskScheduler
+实例操作定时任务的增删，而非采用 ScheduledTaskRegistrar.addTriggerTask 方法维护定时任务。所以需要自行写代码维护
+定时任务列表，控制任务的删减，代码的实现比较繁琐。
+
+如果想要实现可以动态修改的定时策略，建议使用开源组件 Quartz。
+
+查看一下ScheduledTaskRegistrar源码，我们发现该对象初始化完成后会执行scheduleTasks()方法，
+在该方法中添加任务调度信息，最终所有的任务信息都存放在名为scheduledFutures的集合中。
