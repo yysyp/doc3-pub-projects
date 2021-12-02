@@ -1,4 +1,6 @@
 ##Markdown: <https://www.runoob.com/markdown/md-tutorial.html>
+mvn clean test -pl simple-news
+
 #Project structure:
 
 **Springdoc Swagger**

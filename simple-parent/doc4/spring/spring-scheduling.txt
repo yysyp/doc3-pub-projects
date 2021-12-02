@@ -1,0 +1,199 @@
+SchedulingConfigurer 动态修改定时规则，网上有两种方法，都有缺点。
+
+1. 一种如下：
+
+https://blog.csdn.net/xht555/article/details/53121962
+
+此方法，是在触发运行的时候，刷新定时规则，这种方法的缺点是，刷新规则的时间必须是在某次触发运行的时候。
+使用Spring的任务调度给我们的开发带来了极大的便利，不过当我们的任务调度配置完成后，很难再对其进行更改，
+除非停止服务器，修改配置，然后再重启，显然这样是不利于线上操作的，为了实现动态的任务调度修改，我在网上
+也查阅了一些资料，大部分都是基于quartz实现的，使用Spring内置的任务调度则少之又少，而且效果不理想，
+需要在下次任务执行后，新的配置才能生效，做不到立即生效。
+
+
+2. 另一种是
+
+https://blog.csdn.net/jianggujin/article/details/77937316
+
+此方法基于 SchedulingConfigurer 的源码，捕获 ScheduledTaskRegistrar 类的实例，通过该类中的 TaskScheduler
+实例操作定时任务的增删，而非采用 ScheduledTaskRegistrar.addTriggerTask 方法维护定时任务。所以需要自行写代码维护
+定时任务列表，控制任务的删减，代码的实现比较繁琐。
+
+如果想要实现可以动态修改的定时策略，建议使用开源组件 Quartz。
+
+查看一下ScheduledTaskRegistrar源码，我们发现该对象初始化完成后会执行scheduleTasks()方法，
+在该方法中添加任务调度信息，最终所有的任务信息都存放在名为scheduledFutures的集合中。
+
+
+----------------------------------------------------------------------------------------
+
+@Scheduled(fixedDelay = 2000)
+public void scheduleTaskWithFixedDelay() throws InterruptedException {
+    logger.info("Fixed Delay Task: Start Time - {}", formatter.format(LocalDateTime.now()));
+
+    // add some virtual processing time
+    TimeUnit.SECONDS.sleep(3);
+
+    logger.info("Fixed Delay Task: End Time - {}", formatter.format(LocalDateTime.now()));
+}
+
+The task is scheduled to execute every 2 seconds and prints the start and finish times of the execution. Since we have added 3 seconds of virtual processing time, it will take at least 3 seconds to complete. There will be a delay of 5 seconds between successive invocations:
+Fixed Delay Task: Start Time - 14:02:28
+Fixed Delay Task: End Time - 14:02:31
+Fixed Delay Task: Start Time - 14:02:33
+Fixed Delay Task: End Time - 14:02:36
+Fixed Delay Task: Start Time - 14:02:38
+Fixed Delay Task: End Time - 14:02:41
+Fixed Delay Task: Start Time - 14:02:43
+Fixed Delay Task: End Time - 14:02:46
+
+This option is best suited when the previous execution of the task must be completed before executing it again. The fixedDelay property makes sure that is always a delay of n milliseconds between consecutive invocations of a task. For dependent tasks, it is pretty helpful.
+
+----------------------------------------------------------------------------------------
+
+
+通过查看ScheduledTaskRegistrar 源码，scheduler的线程池是没有最大线程数，也没有blocking queue的 capacity 限制的。
+但是实际使用结果来看，设置poolsize就可以限制多少个后台线程来跑scheduler Job.
+所以对于ScheduledThreadPoolExecutor：maxPoolSize 和拒绝策略都是没意义的。
+
+/**
+ * A {@link ThreadPoolExecutor} that can additionally schedule
+ * commands to run after a given delay, or to execute
+ * periodically. This class is preferable to {@link java.util.Timer}
+ * when multiple worker threads are needed, or when the additional
+ * flexibility or capabilities of {@link ThreadPoolExecutor} (which
+ * this class extends) are required.
+ *
+ * <p>Delayed tasks execute no sooner than they are enabled, but
+ * without any real-time guarantees about when, after they are
+ * enabled, they will commence. Tasks scheduled for exactly the same
+ * execution time are enabled in first-in-first-out (FIFO) order of
+ * submission.
+ *
+ * <p>When a submitted task is cancelled before it is run, execution
+ * is suppressed. By default, such a cancelled task is not
+ * automatically removed from the work queue until its delay
+ * elapses. While this enables further inspection and monitoring, it
+ * may also cause unbounded retention of cancelled tasks. To avoid
+ * this, set {@link #setRemoveOnCancelPolicy} to {@code true}, which
+ * causes tasks to be immediately removed from the work queue at
+ * time of cancellation.
+ *
+ * <p>Successive executions of a task scheduled via
+ * {@code scheduleAtFixedRate} or
+ * {@code scheduleWithFixedDelay} do not overlap. While different
+ * executions may be performed by different threads, the effects of
+ * prior executions <a
+ * href="package-summary.html#MemoryVisibility"><i>happen-before</i></a>
+ * those of subsequent ones.
+ *
+ * <p>While this class inherits from {@link ThreadPoolExecutor}, a few
+ * of the inherited tuning methods are not useful for it. In
+ * particular, because it acts as a fixed-sized pool using
+ * {@code corePoolSize} threads and an unbounded queue, adjustments
+ * to {@code maximumPoolSize} have no useful effect. Additionally, it
+ * is almost never a good idea to set {@code corePoolSize} to zero or
+ * use {@code allowCoreThreadTimeOut} because this may leave the pool
+ * without threads to handle tasks once they become eligible to run.
+ *
+ * <p><b>Extension notes:</b> This class overrides the
+ * {@link ThreadPoolExecutor#execute(Runnable) execute} and
+ * {@link AbstractExecutorService#submit(Runnable) submit}
+ * methods to generate internal {@link ScheduledFuture} objects to
+ * control per-task delays and scheduling.  To preserve
+ * functionality, any further overrides of these methods in
+ * subclasses must invoke superclass versions, which effectively
+ * disables additional task customization.  However, this class
+ * provides alternative protected extension method
+ * {@code decorateTask} (one version each for {@code Runnable} and
+ * {@code Callable}) that can be used to customize the concrete task
+ * types used to execute commands entered via {@code execute},
+ * {@code submit}, {@code schedule}, {@code scheduleAtFixedRate},
+ * and {@code scheduleWithFixedDelay}.  By default, a
+ * {@code ScheduledThreadPoolExecutor} uses a task type extending
+ * {@link FutureTask}. However, this may be modified or replaced using
+ * subclasses of the form:
+ *
+ *  <pre> {@code
+ * public class CustomScheduledExecutor extends ScheduledThreadPoolExecutor {
+ *
+ *   static class CustomTask<V> implements RunnableScheduledFuture<V> { ... }
+ *
+ *   protected <V> RunnableScheduledFuture<V> decorateTask(
+ *                Runnable r, RunnableScheduledFuture<V> task) {
+ *       return new CustomTask<V>(r, task);
+ *   }
+ *
+ *   protected <V> RunnableScheduledFuture<V> decorateTask(
+ *                Callable<V> c, RunnableScheduledFuture<V> task) {
+ *       return new CustomTask<V>(c, task);
+ *   }
+ *   // ... add constructors, etc.
+ * }}</pre>
+ *
+ * @since 1.5
+ * @author Doug Lea
+ */
+public class ScheduledThreadPoolExecutor
+        extends ThreadPoolExecutor
+        implements ScheduledExecutorService {
+
+    /*
+     * This class specializes ThreadPoolExecutor implementation by
+     *
+     * 1. Using a custom task type, ScheduledFutureTask for
+     *    tasks, even those that don't require scheduling (i.e.,
+     *    those submitted using ExecutorService execute, not
+     *    ScheduledExecutorService methods) which are treated as
+     *    delayed tasks with a delay of zero.
+     *
+     * 2. Using a custom queue (DelayedWorkQueue), a variant of
+     *    unbounded DelayQueue. The lack of capacity constraint and
+     *    the fact that corePoolSize and maximumPoolSize are
+     *    effectively identical simplifies some execution mechanics
+     *    (see delayedExecute) compared to ThreadPoolExecutor.
+     *
+     * 3. Supporting optional run-after-shutdown parameters, which
+     *    leads to overrides of shutdown methods to remove and cancel
+     *    tasks that should NOT be run after shutdown, as well as
+     *    different recheck logic when task (re)submission overlaps
+     *    with a shutdown.
+     *
+     * 4. Task decoration methods to allow interception and
+     *    instrumentation, which are needed because subclasses cannot
+     *    otherwise override submit methods to get this effect. These
+     *    don't have any impact on pool control logic though.
+     */
+
+
+
+
+public ScheduledThreadPoolExecutor(int corePoolSize) {
+        super(corePoolSize, Integer.MAX_VALUE, 0, NANOSECONDS,
+              new DelayedWorkQueue());
+}
+
+/*
+         * A DelayedWorkQueue is based on a heap-based data structure
+         * like those in DelayQueue and PriorityQueue, except that
+         * every ScheduledFutureTask also records its index into the
+         * heap array. This eliminates the need to find a task upon
+         * cancellation, greatly speeding up removal (down from O(n)
+         * to O(log n)), and reducing garbage retention that would
+         * otherwise occur by waiting for the element to rise to top
+         * before clearing. But because the queue may also hold
+         * RunnableScheduledFutures that are not ScheduledFutureTasks,
+         * we are not guaranteed to have such indices available, in
+         * which case we fall back to linear search. (We expect that
+         * most tasks will not be decorated, and that the faster cases
+         * will be much more common.)
+         *
+         * All heap operations must record index changes -- mainly
+         * within siftUp and siftDown. Upon removal, a task's
+         * heapIndex is set to -1. Note that ScheduledFutureTasks can
+         * appear at most once in the queue (this need not be true for
+         * other kinds of tasks or work queues), so are uniquely
+         * identified by heapIndex.
+         */
+
+
