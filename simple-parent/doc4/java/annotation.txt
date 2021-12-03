@@ -1,0 +1,24 @@
+https://docs.oracle.com/javase/1.5.0/docs/guide/language/annotations.html
+
+Typical application programmers will never have to define an annotation type, but it is not hard to do so. Annotation type declarations are similar to normal interface declarations. An at-sign (@) precedes the interface keyword. Each method declaration defines an element of the annotation type. Method declarations must not have any parameters or a throws clause. Return types are restricted to primitives, String, Class, enums, annotations, and arrays of the preceding types. Methods can have default values. Here is an example annotation type declaration:
+
+/**
+ * Describes the Request-For-Enhancement(RFE) that led
+ * to the presence of the annotated API element.
+ */
+public @interface RequestForEnhancement {
+    int    id();
+    String synopsis();
+    String engineer() default "[unassigned]";
+    String date();    default "[unimplemented]";
+}
+Once an annotation type is defined, you can use it to annotate declarations. An annotation is a special kind of modifier, and can be used anywhere that other modifiers (such as public, static, or final) can be used. By convention, annotations precede other modifiers. Annotations consist of an at-sign (@) followed by an annotation type and a parenthesized list of element-value pairs. The values must be compile-time constants. Here is a method declaration with an annotation corresponding to the annotation type declared above:
+
+@RequestForEnhancement(
+    id       = 2868724,
+    synopsis = "Enable time-travel",
+    engineer = "Mr. Peabody",
+    date     = "4/1/3007"
+)
+public static void travelThroughTime(Date destination) { ... }
+

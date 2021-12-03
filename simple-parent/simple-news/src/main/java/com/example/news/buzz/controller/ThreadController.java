@@ -50,7 +50,7 @@ public class ThreadController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public NewsThreadResponse saveNewsThread(@PathVariable Integer id) {
+    public NewsThreadResponse getNewsThread(@PathVariable Integer id) {
         log.info("--->>NewsThreadRequest search id = {}", id);
 
         NewsThreadDto resultNewThreadDto = threadService.findNewsThreadById(id);
