@@ -5,7 +5,7 @@ set imgName=simple-news
 set ver=v1
 set ns=app
 
-echo 'Please prepare the Dockerfile & k8s.yaml in currentDirectory!'
+echo 'Please prepare the Dockerfile, k8s.yaml in currentDirectory!'
 echo 'curDir=%curDir% - imgName=%imgName% - ver=%ver% - ns=%ns%'
 
 echo '-----------------Maven build & package...-----------------'
@@ -33,6 +33,7 @@ REM echo '$ sudo docker run -itd simple-news:v1 /bin/bash'
 echo '-----------------Kubernetes deploy...-----------------'
 call kubectl delete namespace %ns%
 call kubectl create namespace %ns%
+if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
 call kubectl apply -f k8s.yaml
 if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
 
