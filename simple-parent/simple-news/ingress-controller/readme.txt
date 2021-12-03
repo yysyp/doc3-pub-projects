@@ -2,7 +2,7 @@ This instruction works for mac and window as well:
 https://kubernetes.github.io/ingress-nginx/deploy/#docker-for-mac
 
 0) kubectl create ns test
-1) kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.0/deploy/static/provider/cloud/deploy.yaml
+1) kubectl apply -f cloud-deploy0.32.0.yaml
 2) kubectl get pods --namespace=ingress-nginx
 OR: kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
 3) kubectl create deployment demo --image=httpd --port=80 -n test
