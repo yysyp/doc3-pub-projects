@@ -64,10 +64,13 @@ public class SwaggerOpenApiConfig implements WebMvcConfigurer {
                         .version("Application Version: " + swaggerProperties.getApplicationVersion() + "\n Spring Boot Version: " + SpringBootVersion.getVersion())
                         .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.html"))
                 )
+//                .externalDocs(new ExternalDocumentation()
+//                        .description("SpringDoc Full Documentation")
+//                        .url("https://springdoc.org/")
+//                )
                 .externalDocs(new ExternalDocumentation()
-                        .description("SpringDoc Full Documentation")
-                        .url("https://springdoc.org/")
-                );
+                        .description("H2-console")
+                        .url("/h2-console?url=jdbc:h2:mem:testdb"));
     }
 
     /**

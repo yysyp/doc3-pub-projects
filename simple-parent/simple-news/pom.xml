@@ -166,6 +166,10 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArguments>
+                        <bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
+                        <!--<bootclasspath>${JAVA_HOME}/jre/lib/rt.jar</bootclasspath>-->
+                    </compilerArguments>
                 </configuration>
             </plugin>
 
