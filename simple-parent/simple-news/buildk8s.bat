@@ -8,7 +8,7 @@ set ns=app
 echo 'Please prepare the Dockerfile, k8s.yaml in currentDirectory!'
 echo 'curDir=%curDir% - imgName=%imgName% - ver=%ver% - ns=%ns%'
 
-echo '-----------------Maven build & package...-----------------'
+echo '-----------------Maven build and package...-----------------'
 call mvn clean package
 if %errorlevel% neq 0 exit /b %errorlevel%
 
@@ -40,6 +40,7 @@ if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
 REM echo 'kubectl get secret simple-news-key -o yaml'
 REM echo 'kubectl exec -it simple-news-web-7f9699c8b7-m6dcx -n mynamespace -- /bin/sh'
 REM echo 'http://localhost:30080/springdoc/docs.html'
+REM echo 'Explore /springdoc/api-docs'
 REM echo 'http://localhost:30080/springdoc/api-docs'
 REM echo 'http://localhost:30080/springdoc/api-docs.yaml'
 REM echo kubectl describe ingress nodeport-ingress -n app

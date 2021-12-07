@@ -10,4 +10,5 @@ RUN sh -c 'mkdir keys' &&\
     sh -c 'chmod -R 777 logs/'
 
 ENV GOOGLE_APPLICATION_CREDENTIALS=/keys/credentials.json
+ENV spring.profiles.active=k8
 ENTRYPOINT ["java", "-Xms512m", "-Xmx512m", "-server", "-jar", "app.jar"]
