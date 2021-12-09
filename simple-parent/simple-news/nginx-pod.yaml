@@ -37,10 +37,14 @@ spec:
               mountPath: /html
           command: ["/bin/sh", "-c"]
           args:
-            - while true; do
+            - for number in 1 2 3 4 5; do
                 date >> /html/index.html;
                 sleep 5;
               done
+            #- while true; do
+            #    date >> /html/index.html;
+            #    sleep 5;
+            #  done
 
 #kubectl exec ngx -c 1st -n app -- /bin/cat /usr/share/nginx/html/index.html
 #kubectl exec ngx -c 2nd -n app -- /bin/cat /html/index.html
@@ -99,6 +103,12 @@ data:
             index index.html;
             root /usr/share/nginx/html;
 
+            location /testbaidu {
+                proxy_pass http://baidu.com;
+            }
+            location /testb {
+                proxy_pass http://localhost:8080;
+            }
             location / {
                 #proxy_pass http://localhost:10000;
                 try_files $uri /index.html;
