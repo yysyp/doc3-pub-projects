@@ -31,6 +31,8 @@ public class NewsThread implements java.io.Serializable {
 
     private Boolean okFlag;
 
+    private String status;
+
     private LocalDateTime createdAt;
 
     private String createdBy;

@@ -22,6 +22,11 @@ public interface ThreadDao extends MongoRepository<NewsThread, Integer> {
             Pageable pageable
             );
 
+    List<NewsThread> findNewsThreadByStatus(
+            @Param("status") String status,
+            Pageable pageable
+    );
+
 // Difference between above one is that the above one will only query one page date
 // And NOT to count total records.
 // But this one returns Pageable object, it actually fired two query, one is for one

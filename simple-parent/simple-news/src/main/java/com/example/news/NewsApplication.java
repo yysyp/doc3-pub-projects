@@ -49,6 +49,7 @@ public class NewsApplication {
             newsThread.setId(i);
             newsThread.setUniqueId(i+"");
             newsThread.setUser("string");
+            newsThread.setStatus("CREATED");
             newsThread.setCreatedAt(createAt);
             mongoTemplate.save(newsThread);
         }
