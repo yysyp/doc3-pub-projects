@@ -29,6 +29,44 @@ public class StatusFlowJob {
     @Autowired
     private PageProcessorTemplate<NewsThread> pageProcessorTemplate;
 
+    /**
+     * Solution 1: Deal in batch this is a better solution...
+     * */
+    private void updateStatusBatch(String statusFrom, UpdateStatusBatchHandler<NewsThread> updateStatusBatchHandler) {
+        PageProcessorTemplate.ProcessorParam processorParam = new PageProcessorTemplate.ProcessorParam();
+        processorParam.setPageSize(pageSize);
+        processorParam.setMaxProcessPages(maxProcessPages);
+        LocalDateTime now = LocalDateTime.now();
+        pageProcessorTemplate.processByPage(processorParam, new PageProcessorTemplate.PageCallback<NewsThread>() {
+            @Override
+            public List fetchPageData(Pageable pageable) {
+                log.info("News processor fetch one page...");
+                List<NewsThread> newsThreadList =
+                        threadDao.findNewsThreadByStatus(statusFrom, pageable);
+                return newsThreadList;
+            }
+
+            @Override
+            public void processPage(List<NewsThread> list) {
+                log.info("News processing list...");
+                List<String> resultStatus = updateStatusBatchHandler.process(list);
+                for (int i = 0, n = resultStatus.size(); i < n; i++) {
+                    list.get(i).setStatus(resultStatus.get(i));
+                }
+                threadDao.saveAll(list);
+            }
+        });
+    }
+
+    public interface UpdateStatusBatchHandler<T> {
+        List<String> process(List<T> list);
+    }
+
+
+/**
+  * Solution 2: Below code deal result one by one. it is not a good solution.
+ */
+
     public static final String[] STATUS_LIST = {"CREATED", "STAGE1ED", "STAGE2ED", "STAGE3ED", "STAGE4ED", "STAGE5ED"};
     public static final String[] STATUS_ERROR_LIST = {"STAGE1_ERR", "STAGE2_ERR", "STAGE3_ERR", "STAGE4_ERR", "STAGE5_ERR"};
 
