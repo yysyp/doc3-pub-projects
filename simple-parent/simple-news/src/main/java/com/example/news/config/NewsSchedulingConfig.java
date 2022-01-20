@@ -35,7 +35,7 @@ public class NewsSchedulingConfig implements SchedulingConfigurer {
         scheduler.setRemoveOnCancelPolicy(true);
         scheduler.initialize();
         taskRegistrar.setScheduler(scheduler);
-        taskRegistrar.addTriggerTask(newsTask, newsTrigger);
+        //taskRegistrar.addTriggerTask(newsTask, newsTrigger);
     }
 
 }

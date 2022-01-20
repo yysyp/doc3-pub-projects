@@ -1,0 +1,58 @@
+##kubectl create namespace db
+##kubectl delete namespace db
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  namespace: db
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template: 
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: mysql:5.7
+          name: mysql-con
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_USER
+              value: dbuser
+            - name: MYSQL_PASSWORD
+              value: dbuser
+          args: ["--default-authentication-plugin=mysql_native_password"]
+          ports:
+            - containerPort: 3306 
+              name: mysql
+#          lifecycle:
+#            postStart:
+#              exec:
+#                command: ["/bin/sh", "-c", "mysql -u root --password='root' -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';\""]
+                
+---
+              
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: db
+  labels:
+    app: mysql
+spec:
+  type: NodePort
+  selector:
+      app: mysql
+  ports:
+  - protocol : TCP
+    nodePort: 30306
+    port: 3306
+    targetPort: 3306
+    

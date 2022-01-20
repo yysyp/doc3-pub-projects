@@ -30,8 +30,8 @@ public class NewThreadJob {
     @Autowired
     private PageProcessorTemplate<NewsThread> pageProcessorTemplate;
 
-    @Scheduled(cron  = "${scheduling.houseKeeper.cron:*/3 * * * * ?}")
-    @SchedulerLock(name = "threadHouseKeeperRoutine", lockAtLeastFor = "PT1S", lockAtMostFor = "PT10M")
+    //@Scheduled(cron  = "${scheduling.houseKeeper.cron:*/3 * * * * ?}")
+    //@SchedulerLock(name = "threadHouseKeeperRoutine", lockAtLeastFor = "PT1S", lockAtMostFor = "PT10M")
     public void threadHouseKeeperRoutine() {
         log.info("News house keeper routine started...");
         //Check clock time.

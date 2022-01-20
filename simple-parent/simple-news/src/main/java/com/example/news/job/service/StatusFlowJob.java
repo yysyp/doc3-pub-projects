@@ -64,14 +64,16 @@ public class StatusFlowJob {
 
 
 /**
+ * -----------------------------------------------------------------------------------------------------------------------------------------------------------
   * Solution 2: Below code deal result one by one. it is not a good solution.
+ *
  */
 
     public static final String[] STATUS_LIST = {"CREATED", "STAGE1ED", "STAGE2ED", "STAGE3ED", "STAGE4ED", "STAGE5ED"};
     public static final String[] STATUS_ERROR_LIST = {"STAGE1_ERR", "STAGE2_ERR", "STAGE3_ERR", "STAGE4_ERR", "STAGE5_ERR"};
 
-    @Scheduled(cron  = "${scheduling.statusflow.cron:*/5 * * * * ?}")
-    @SchedulerLock(name = "updateStatus", lockAtLeastFor = "PT1S", lockAtMostFor = "PT10M")
+    //@Scheduled(cron  = "${scheduling.statusflow.cron:*/5 * * * * ?}")
+    //@SchedulerLock(name = "updateStatus", lockAtLeastFor = "PT1S", lockAtMostFor = "PT10M")
     public void updateStatus() {
         log.info("News status check routine started...");
         updateStatus(STATUS_LIST[0], STATUS_LIST[1], STATUS_ERROR_LIST[0], newsThread -> {

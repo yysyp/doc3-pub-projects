@@ -42,14 +42,14 @@
     </appender>
 
     <springProfile name="!prod">
-        <logger additivity="false" level="INFO" name="org">
+        <logger additivity="false" level="DEBUG" name="com.example.news">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </logger>
-        <logger additivity="false" level="INFO" name="de.bwaldvogel.mongo">
+        <logger additivity="false" level="DEBUG" name="net.javacrumbs.shedlock">
             <appender-ref ref="CONSOLE"/>
         </logger>
-        <root level="DEBUG">
+        <root level="INFO">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>
