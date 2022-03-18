@@ -27,7 +27,7 @@ public class DistributedLockedTask {
             log.error("--->>The task is not locked.");
             return;
         }
-        long randomSleep = RandomUtils.nextLong(0, 10000);
+        long randomSleep = RandomUtils.nextLong(0, 1000);
         Thread.sleep(randomSleep);
         //log.debug("--->>distributedLockTask1 stopped after sleep {}ms", randomSleep);
         MDC.clear();

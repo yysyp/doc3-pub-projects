@@ -1,7 +1,7 @@
 package com.example.news.exception;
 
 import com.example.news.dto.response.ErrorResponse;
-import com.example.news.util.DateTimeUtil;
+import com.example.news.util.MyTimeUtil;
 import com.example.news.util.HeaderUtil;
 import com.example.news.util.RequestContextUtil;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -58,7 +58,7 @@ public class ApiBaseException extends RuntimeException {
             String trace = ExceptionUtils.getStackTrace(this);
             errorResponse.setTrace(trace);
         }
-        errorResponse.setTimestamp(DateTimeUtil.getTimestamp());
+        errorResponse.setTimestamp(MyTimeUtil.getNowStr());
         errorResponse.setPath(RequestContextUtil.getRequest().getPathInfo());
         return errorResponse;
     }
